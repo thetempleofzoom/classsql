@@ -1,6 +1,6 @@
 import requests
 import selectorlib
-import smtplib, ssl
+import smtplib, ssl, os
 import time
 import sqlite3
 
@@ -43,7 +43,7 @@ class Email:
         host = 'smtp.gmail.com'
         port = 465
         username = 'shadowysupercoderssc@gmail.com'
-        password = 'kajcafpjykemiwpr'
+        password = os.environ.get('SSCPW')
         receiver = 'shadowysupercoderssc@gmail.com'
         context = ssl.create_default_context()
 
