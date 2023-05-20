@@ -29,7 +29,7 @@ class Database:
         self.cursor.execute("INSERT INTO events VALUES(?,?,?)", newrow)
         self.connection.commit()
 
-        send_email(message)
+        email.send(message)
 
     def check(self, newrow):
         band, city, date = newrow
@@ -38,23 +38,25 @@ class Database:
         row = self.cursor.fetchall()
         return row
 
-def send_email(message):
-    host = 'smtp.gmail.com'
-    port = 465
-    username = 'shadowysupercoderssc@gmail.com'
-    password = 'kajcafpjykemiwpr'
-    receiver = 'shadowysupercoderssc@gmail.com'
-    context = ssl.create_default_context()
+class Email:
+    def send(self, message):
+        host = 'smtp.gmail.com'
+        port = 465
+        username = 'shadowysupercoderssc@gmail.com'
+        password = 'kajcafpjykemiwpr'
+        receiver = 'shadowysupercoderssc@gmail.com'
+        context = ssl.create_default_context()
 
-    with smtplib.SMTP_SSL(host=host, port=port, context=context) as server:
-        server.login(username, password)
-        server.sendmail(username, receiver, message)
-    print('mail sent')
+        with smtplib.SMTP_SSL(host=host, port=port, context=context) as server:
+            server.login(username, password)
+            server.sendmail(username, receiver, message)
+            print('mail sent')
 
 
 if __name__ =="__main__":
     while True:
         tours = Tours()
+        email = Email()
         scraped = tours.scrape(url)
         extracted = tours.extract(scraped)
 
