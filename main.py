@@ -18,25 +18,25 @@ class Tours:
         tour = extractor.extract(source)['tourname']
         return tour
 
-def check(newrow):
-    band, city, date = newrow
-    print(band, city, date)
-    cursor.execute("SELECT * FROM events WHERE band=? AND city=? AND date=?", (band, city, date))
-    row = cursor.fetchall()
-    return row
 
 class Database:
     def __init__(self, dbpath):
         self.connection = sqlite3.connect(dbpath)
+        self.cursor = self.connection.cursor()
 
     def store(self, newrow, message):
-        cursor = self.connection.cursor()
         #check for dups and write if no dups
-        cursor.execute("INSERT INTO events VALUES(?,?,?)", newrow)
-        connection.commit()
+        self.cursor.execute("INSERT INTO events VALUES(?,?,?)", newrow)
+        self.connection.commit()
 
         send_email(message)
 
+    def check(self, newrow):
+        band, city, date = newrow
+        print(band, city, date)
+        self.cursor.execute("SELECT * FROM events WHERE band=? AND city=? AND date=?", (band, city, date))
+        row = self.cursor.fetchall()
+        return row
 
 def send_email(message):
     host = 'smtp.gmail.com'
@@ -63,15 +63,14 @@ if __name__ =="__main__":
         message = message.encode('utf-8')
 
         if extracted != "No upcoming tours":
+            database = Database(dbpath="data.db")
             newrow = extracted.split(",")
             newrow = [n.strip() for n in newrow]
             print(newrow)
-            row = check(newrow)
+            row = database.check(newrow)
             if not row:
-                database = Database(dbpath="data.db")
                 database.store(newrow, message)
 
-                
         time.sleep(2)
 
 
